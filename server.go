@@ -77,7 +77,7 @@ func main() {
 	h := handler.NewHandler(db)
 	b := business.NewBusiness(db)
 	m := middleware.NewMiddleware(db)
-	
+
 	r.Handle("/ping", http.HandlerFunc(pingHandler))
 	handler.MountUserHandler(r, h, m)
 	handler.MountAccountHandler(r, h, m)
