@@ -43,9 +43,9 @@ func (b *accountBusiness) Withdrawal(ctx context.Context, input entity.Withdrawa
 		return err
 	}
 
-	account, err := b.repo.Account.FindByUserID(ctx, user.ID.String())
+	account, err := b.repo.Account.FindByUserID(ctx, user.ID)
 	if err != nil {
-		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID.String(), consts.TxStatusFAILED, nil); err != nil {
+		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID, consts.TxStatusFAILED, nil); err != nil {
 			return err
 		}
 		return err
@@ -73,17 +73,17 @@ func (b *accountBusiness) Withdrawal(ctx context.Context, input entity.Withdrawa
 		if err := tx.Rollback(); err != nil {
 			return err
 		}
-		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID.String(), consts.TxStatusFAILED, nil); err != nil {
+		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID, consts.TxStatusFAILED, nil); err != nil {
 			return err
 		}
 		return err
 	}
 
-	if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID.String(), consts.TxStatusCOMPLETED, tx); err != nil {
+	if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID, consts.TxStatusCOMPLETED, tx); err != nil {
 		if err := tx.Rollback(); err != nil {
 			return err
 		}
-		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID.String(), consts.TxStatusFAILED, nil); err != nil {
+		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID, consts.TxStatusFAILED, nil); err != nil {
 			return err
 		}
 	}
@@ -113,9 +113,9 @@ func (b *accountBusiness) Deposit(ctx context.Context, input entity.Deposit) err
 		return err
 	}
 
-	account, err := b.repo.Account.FindByUserID(ctx, user.ID.String())
+	account, err := b.repo.Account.FindByUserID(ctx, user.ID)
 	if err != nil {
-		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID.String(), consts.TxStatusFAILED, nil); err != nil {
+		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID, consts.TxStatusFAILED, nil); err != nil {
 			return err
 		}
 		return err
@@ -139,17 +139,17 @@ func (b *accountBusiness) Deposit(ctx context.Context, input entity.Deposit) err
 		if err := tx.Rollback(); err != nil {
 			return err
 		}
-		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID.String(), consts.TxStatusFAILED, nil); err != nil {
+		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID, consts.TxStatusFAILED, nil); err != nil {
 			return err
 		}
 		return err
 	}
 
-	if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID.String(), consts.TxStatusCOMPLETED, tx); err != nil {
+	if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID, consts.TxStatusCOMPLETED, tx); err != nil {
 		if err := tx.Rollback(); err != nil {
 			return err
 		}
-		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID.String(), consts.TxStatusFAILED, nil); err != nil {
+		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID, consts.TxStatusFAILED, nil); err != nil {
 			return err
 		}
 	}

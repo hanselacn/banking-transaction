@@ -4,11 +4,12 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/google/uuid"
 	"github.com/hanselacn/banking-transaction/internal/entity"
 )
 
 type AccountRepositories interface {
-	FindByUserID(ctx context.Context, id string) (*entity.Account, error)
+	FindByUserID(ctx context.Context, id uuid.UUID) (*entity.Account, error)
 	Create(ctx context.Context, account entity.Account) error
 	UpdateBalance(ctx context.Context, account entity.Account, tx *sql.Tx) error
 	UpdateInterestRate(ctx context.Context, account entity.Account) error
@@ -48,7 +49,7 @@ func (a accountRepo) Create(ctx context.Context, account entity.Account) error {
 	return nil
 }
 
-func (a accountRepo) FindByUserID(ctx context.Context, id string) (*entity.Account, error) {
+func (a accountRepo) FindByUserID(ctx context.Context, id uuid.UUID) (*entity.Account, error) {
 	var (
 		query = `
 		SELECT id, user_id, account_number, balance, interest_rate

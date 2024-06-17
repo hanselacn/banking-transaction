@@ -5,12 +5,13 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/hanselacn/banking-transaction/internal/entity"
 )
 
 type TransactionRepo interface {
 	CreateTransaction(ctx context.Context, input entity.Transaction) error
-	UpdateTransactionStatus(ctx context.Context, trID string, status string, tx *sql.Tx) error
+	UpdateTransactionStatus(ctx context.Context, trID uuid.UUID, status string, tx *sql.Tx) error
 }
 
 type transactionRepo struct {
@@ -55,7 +56,7 @@ func (t transactionRepo) CreateTransaction(ctx context.Context, input entity.Tra
 }
 
 // UpdateTransaction implements TransactionRepo.
-func (t transactionRepo) UpdateTransactionStatus(ctx context.Context, trID string, status string, tx *sql.Tx) error {
+func (t transactionRepo) UpdateTransactionStatus(ctx context.Context, trID uuid.UUID, status string, tx *sql.Tx) error {
 	var (
 		query = `
 		UPDATE transactions
