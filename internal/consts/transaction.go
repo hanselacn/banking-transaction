@@ -8,6 +8,7 @@ const (
 	TxActionDEPOSIT    = "DEPOSIT"
 	TxActionTRANSFER   = "TRANSFER"
 	TxActionPURCHASE   = "PURCHASE"
+	TxActionINTEREST   = "INTEREST"
 
 	TxStatusINPROGRESS = "IN_PROGRESS"
 	TxStatusCOMPLETED  = "COMPLETED"

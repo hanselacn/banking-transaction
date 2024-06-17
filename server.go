@@ -1,14 +1,20 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
+	"time"
 
+	"github.com/go-co-op/gocron"
 	"github.com/gorilla/mux"
 	cfg "github.com/hanselacn/banking-transaction/config"
+	"github.com/hanselacn/banking-transaction/internal/business"
 	"github.com/hanselacn/banking-transaction/internal/handler"
 	"github.com/hanselacn/banking-transaction/internal/middleware"
 	"github.com/joho/godotenv"
@@ -39,6 +45,15 @@ func main() {
 			Port: os.Getenv("API_PORT"),
 			TLS:  os.Getenv("API_TLS"),
 		},
+		Worker: cfg.Worker{
+			PayoutInterval: os.Getenv("PAYOUT_INTERVAL"),
+			PayoutTimeUnit: os.Getenv("PAYOUT_TIME_UNIT"),
+		},
+	}
+
+	payoutInterval, err := strconv.Atoi(cfg.Worker.PayoutInterval)
+	if err != nil {
+		payoutInterval = 1
 	}
 
 	connStr := fmt.Sprintf("%s://%s:%s@%s/%s?sslmode=disable", cfg.DB.Driver, cfg.DB.User, cfg.DB.Password, cfg.DB.Host, cfg.DB.Name)
@@ -60,9 +75,39 @@ func main() {
 	fmt.Println("Successfully connected to the database!")
 
 	h := handler.NewHandler(db)
+	b := business.NewBusiness(db)
 	m := middleware.NewMiddleware(db)
 	handler.MountUserHandler(r, h, m)
 	handler.MountAccountHandler(r, h, m)
+
+	go func() {
+		log.Println(eventName, "[WORKER] Starting Interest Payout Worker...")
+		jobHandler := func() {
+			_, totalData, totalSuccess, err := b.AccountBusiness.InterestPayoutWorker(context.Background())
+			if err != nil {
+				log.Println(eventName, "[WORKER] Failed Occured While Executing Interest Payout")
+			}
+			log.Println(eventName, fmt.Sprintf("[WORKER] Success Execute %d out of %d Interest Payout Data", totalSuccess, totalData))
+		}
+
+		sh := gocron.NewScheduler(time.Local)
+		switch strings.ToUpper(cfg.Worker.PayoutTimeUnit) {
+		case "YEARS", "YEAR", "Y":
+			sh.Every(12 * payoutInterval).Month().Do(jobHandler)
+		case "MONTHS", "MONTH", "M":
+			sh.Every(payoutInterval).Month().Do(jobHandler)
+		case "DAYS", "DAY", "D":
+			sh.Every(payoutInterval).Day().Do(jobHandler)
+		case "MINUTES", "MINUTE", "MIN":
+			sh.Every(payoutInterval).Minute().Do(jobHandler)
+		case "SECONDS", "SECOND", "SEC":
+			sh.Every(payoutInterval).Second().Do(jobHandler)
+		default:
+			sh.Every(payoutInterval).Month().Do(jobHandler)
+		}
+		sh.StartAsync()
+	}()
+	
 	// Start the server
 	fmt.Printf("Starting server on :%s \n", cfg.Server.Port)
 	switch os.Getenv("API_TLS") {

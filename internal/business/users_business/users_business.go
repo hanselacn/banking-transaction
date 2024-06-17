@@ -63,8 +63,10 @@ func (b *usersBusiness) CreateUser(ctx context.Context, input entity.CreateUserI
 
 	if err := b.repo.Users.Create(ctx, user, tx); err != nil {
 		if err := tx.Rollback(); err != nil {
+			log.Println(eventName, err)
 			return nil, err
 		}
+		log.Println(eventName, err)
 		return nil, err
 	}
 
@@ -74,8 +76,10 @@ func (b *usersBusiness) CreateUser(ctx context.Context, input entity.CreateUserI
 		Password: input.Password,
 	}, tx); err != nil {
 		if err := tx.Rollback(); err != nil {
+			log.Println(eventName, err)
 			return nil, err
 		}
+		log.Println(eventName, err)
 		return nil, err
 	}
 
@@ -93,15 +97,19 @@ func (b *usersBusiness) CreateUser(ctx context.Context, input entity.CreateUserI
 		InterestRate:  defaultInterestRate,
 	}, tx); err != nil {
 		if err := tx.Rollback(); err != nil {
+			log.Println(eventName, err)
 			return nil, err
 		}
+		log.Println(eventName, err)
 		return nil, err
 	}
 
 	if err := tx.Commit(); err != nil {
 		if err := tx.Rollback(); err != nil {
+			log.Println(eventName, err)
 			return nil, err
 		}
+		log.Println(eventName, err)
 		return nil, err
 	}
 
@@ -109,7 +117,11 @@ func (b *usersBusiness) CreateUser(ctx context.Context, input entity.CreateUserI
 }
 
 func (b *usersBusiness) UpdateRoleByUserName(ctx context.Context, input entity.User) error {
+	var (
+		eventName = "business.users.update_role"
+	)
 	if err := b.repo.Users.UpdateRoleByUserName(ctx, input); err != nil {
+		log.Println(eventName, err)
 		return err
 	}
 	return nil

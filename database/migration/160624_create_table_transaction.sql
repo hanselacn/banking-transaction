@@ -1,5 +1,5 @@
 CREATE TYPE transaction_type AS ENUM ('D', 'C');
-CREATE TYPE transaction_action AS ENUM ('WITHDRAWAL', 'DEPOSIT','TRANSFER','PURCHASE');
+CREATE TYPE transaction_action AS ENUM ('WITHDRAWAL', 'DEPOSIT','TRANSFER','PURCHASE','INTEREST');
 CREATE TYPE transaction_status AS ENUM ('IN_PROGRESS','COMPLETED','FAILED');
 
 CREATE TABLE transactions (
