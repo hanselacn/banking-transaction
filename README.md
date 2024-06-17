@@ -11,6 +11,9 @@ go mod vendor
 go mod download
 go run server.go
 
+to execute security test
+go test ./.
+
 You have to make a super admin account to grant access to other users.
 
 there is two ways :
@@ -23,7 +26,6 @@ after that directly change the role on that user in table users to 'super_admin'
 2. With Seeder :
 use env.example as .env to prevent error while using existing AES encrypt decryption (seeder data use the example AES KEY)
 excecute SQL on ./database/seeder
-
 
 
 After those steps, you can disable that route and begin to use the features.
@@ -97,4 +99,7 @@ That includes :
 - TLS enabled for secure connection
 - Payload and Input validation to prevent XSS attack
 - Placeholder ($) usage on queries to prevent SQL Injection
+
+to run quick test use this command :
+go test ./.
 ```
