@@ -22,7 +22,7 @@ var (
 var (
 	AlphabetNumericSpaceCharRule = validation.Match(AlphabetNumericSpaceChar).Error(`must be among or combination these characters (a-z, A-Z, 0-9, space, enter, tab, comma(,), dot(.), slash (/), question mark(?), exclamation mark(!), underscore(_), plus and minus(-+))`)
 	AmountRule                   = validation.Match(Amount).Error(`invalid amount, must be between 0-1000000000000`)
-	FullNameRule                 = validation.Match(FullName).Error(`invalid input`)
+	FullNameRule                 = validation.Match(FullName).Error(`invalid full name`)
 	UserNameRule                 = validation.Match(UserName).Error(`must be among this combination (a-z,A-Z,0-9,dash(-),underscore(_)) with length between 3-100 characters`)
 	InterestRateRule             = validation.Match(InterestRate).Error(`interest rate must be between 0-1`)
 	SpecialCharRegexRule         = validation.Match(SpecialCharRegex).Error("password must be a combination of alphanumeric + symbols with length between 8-20 characters")

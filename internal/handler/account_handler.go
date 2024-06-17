@@ -53,6 +53,11 @@ func (h *AccountHandler) Withdrawal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if payload.Amount > 1000000000000 || payload.Amount < 1 {
+		response.JsonResponse(w, "withdrawal error", nil, "ammount must between 1-1000000000000", http.StatusUnprocessableEntity)
+		return
+	}
+
 	ctxUserName := ctx.Value(middleware.CtxValueUserName)
 	if ctxUserName != payload.Username {
 		response.JsonResponse(w, "Forbidden", nil, "You Have to Access your own Account", http.StatusForbidden)
@@ -98,6 +103,11 @@ func (h *AccountHandler) Deposit(w http.ResponseWriter, r *http.Request) {
 
 	if err := payload.Validate(); err != nil {
 		response.JsonResponse(w, "deposit error", nil, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	if payload.Amount > 1000000000000 || payload.Amount < 1 {
+		response.JsonResponse(w, "deposit error", nil, "ammount must between 1-1000000000000", http.StatusUnprocessableEntity)
 		return
 	}
 

@@ -11,7 +11,7 @@ import (
 
 	"github.com/hanselacn/banking-transaction/internal/pkg/hashx"
 	"github.com/hanselacn/banking-transaction/internal/pkg/response"
-	"github.com/hanselacn/banking-transaction/repo"
+	"github.com/hanselacn/banking-transaction/internal/repo"
 )
 
 type Middleware interface {

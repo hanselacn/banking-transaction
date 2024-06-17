@@ -15,7 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hanselacn/banking-transaction/internal/consts"
 	"github.com/hanselacn/banking-transaction/internal/entity"
-	"github.com/hanselacn/banking-transaction/repo"
+	"github.com/hanselacn/banking-transaction/internal/repo"
 )
 
 type UsersBusiness interface {

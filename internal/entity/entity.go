@@ -31,7 +31,7 @@ type CreateUserInput struct {
 func (s *CreateUserInput) Validate() error {
 	return validation.ValidateStruct(s,
 		validation.Field(&s.Username, validation.Required, rule.UserNameRule),
-		validation.Field(&s.Fullname, rule.AmountRule),
+		validation.Field(&s.Fullname, rule.AlphabetNumericSpaceCharRule),
 		validation.Field(&s.Password, rule.SpecialCharRegexRule),
 		validation.Field(&s.Password, rule.LengthRegexRule),
 		validation.Field(&s.Password, rule.LowercaseRegexRule),
@@ -48,7 +48,6 @@ type Withdrawal struct {
 func (s *Withdrawal) Validate() error {
 	return validation.ValidateStruct(s,
 		validation.Field(&s.Username, validation.Required, rule.UserNameRule),
-		validation.Field(&s.Amount, rule.AmountRule),
 	)
 }
 
@@ -60,7 +59,6 @@ type Deposit struct {
 func (s *Deposit) Validate() error {
 	return validation.ValidateStruct(s,
 		validation.Field(&s.Username, validation.Required, rule.UserNameRule),
-		validation.Field(&s.Amount, rule.AmountRule),
 	)
 }
 

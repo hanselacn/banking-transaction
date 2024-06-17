@@ -3,10 +3,10 @@ package repo
 import (
 	"database/sql"
 
-	accountrepo "github.com/hanselacn/banking-transaction/repo/account_repo"
-	authorizationrepo "github.com/hanselacn/banking-transaction/repo/authorization_repo"
-	transactionrepo "github.com/hanselacn/banking-transaction/repo/transaction_repo"
-	usersrepo "github.com/hanselacn/banking-transaction/repo/users_repo"
+	accountrepo "github.com/hanselacn/banking-transaction/internal/repo/account_repo"
+	authorizationrepo "github.com/hanselacn/banking-transaction/internal/repo/authorization_repo"
+	transactionrepo "github.com/hanselacn/banking-transaction/internal/repo/transaction_repo"
+	usersrepo "github.com/hanselacn/banking-transaction/internal/repo/users_repo"
 )
 
 type Repo struct {

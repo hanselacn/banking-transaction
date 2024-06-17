@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/hanselacn/banking-transaction/internal/entity"
-	"github.com/hanselacn/banking-transaction/repo"
+	"github.com/hanselacn/banking-transaction/internal/repo"
 )
 
 type AuthorizationBusiness interface {

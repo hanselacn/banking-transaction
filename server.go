@@ -77,6 +77,8 @@ func main() {
 	h := handler.NewHandler(db)
 	b := business.NewBusiness(db)
 	m := middleware.NewMiddleware(db)
+	
+	r.Handle("/ping", http.HandlerFunc(pingHandler))
 	handler.MountUserHandler(r, h, m)
 	handler.MountAccountHandler(r, h, m)
 
@@ -107,7 +109,7 @@ func main() {
 		}
 		sh.StartAsync()
 	}()
-	
+
 	// Start the server
 	fmt.Printf("Starting server on :%s \n", cfg.Server.Port)
 	switch os.Getenv("API_TLS") {
@@ -125,4 +127,9 @@ func main() {
 			fmt.Println("Error starting server:", err)
 		}
 	}
+}
+
+func pingHandler(w http.ResponseWriter, r *http.Request) {
+	// Respond with a simple message
+	fmt.Fprintf(w, "Pong!")
 }

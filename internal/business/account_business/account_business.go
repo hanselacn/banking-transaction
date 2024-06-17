@@ -10,7 +10,7 @@ import (
 	"github.com/hanselacn/banking-transaction/internal/consts"
 	"github.com/hanselacn/banking-transaction/internal/entity"
 	"github.com/hanselacn/banking-transaction/internal/pkg/errbank"
-	"github.com/hanselacn/banking-transaction/repo"
+	"github.com/hanselacn/banking-transaction/internal/repo"
 )
 
 type AccountBusiness interface {
