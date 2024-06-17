@@ -3,9 +3,11 @@ package accountrepo
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"github.com/google/uuid"
 	"github.com/hanselacn/banking-transaction/internal/entity"
+	"github.com/hanselacn/banking-transaction/internal/pkg/errbank"
 )
 
 type AccountRepositories interface {
@@ -22,7 +24,8 @@ type accountRepo struct {
 // Create implements AccountRepositories.
 func (a accountRepo) Create(ctx context.Context, account entity.Account) error {
 	var (
-		query = `
+		eventName = "repo.account.create_account"
+		query     = `
 		INSERT INTO account (
 		id,
 		user_id,
@@ -43,7 +46,8 @@ func (a accountRepo) Create(ctx context.Context, account entity.Account) error {
 
 	_, err := a.db.ExecContext(ctx, query, args...)
 	if err != nil {
-		return err
+		log.Println(eventName, err)
+		return errbank.TranslateDBError(err)
 	}
 
 	return nil
@@ -51,7 +55,8 @@ func (a accountRepo) Create(ctx context.Context, account entity.Account) error {
 
 func (a accountRepo) FindByUserID(ctx context.Context, id uuid.UUID) (*entity.Account, error) {
 	var (
-		query = `
+		eventName = "repo.account.find_user_by_id"
+		query     = `
 		SELECT id, user_id, account_number, balance, interest_rate
 		FROM account
 		WHERE user_id = $1
@@ -64,6 +69,7 @@ func (a accountRepo) FindByUserID(ctx context.Context, id uuid.UUID) (*entity.Ac
 
 	err := a.db.QueryRowContext(ctx, query, args...).Scan(&account)
 	if err != nil {
+		log.Println(eventName, err)
 		return nil, err
 	}
 
@@ -72,7 +78,8 @@ func (a accountRepo) FindByUserID(ctx context.Context, id uuid.UUID) (*entity.Ac
 
 func (a accountRepo) UpdateBalance(ctx context.Context, account entity.Account, tx *sql.Tx) error {
 	var (
-		query = `
+		eventName = "repo.account.update_balance"
+		query     = `
 		UPDATE account
 		SET balance = $1
 		WHERE user_id = $2
@@ -86,12 +93,14 @@ func (a accountRepo) UpdateBalance(ctx context.Context, account entity.Account, 
 	if tx != nil {
 		_, err := tx.ExecContext(ctx, query, args...)
 		if err != nil {
-			return err
+			log.Println(eventName, err)
+			return errbank.TranslateDBError(err)
 		}
 	} else {
 		_, err := a.db.ExecContext(ctx, query, args...)
 		if err != nil {
-			return err
+			log.Println(eventName, err)
+			return errbank.TranslateDBError(err)
 		}
 	}
 	return nil
@@ -99,7 +108,8 @@ func (a accountRepo) UpdateBalance(ctx context.Context, account entity.Account, 
 
 func (a accountRepo) UpdateInterestRate(ctx context.Context, account entity.Account) error {
 	var (
-		query = `
+		eventName = "repo.account.update_interest_rate"
+		query     = `
 		UPDATE account
 		SET interest_rate = $1
 		WHERE user_id = $1
@@ -112,7 +122,8 @@ func (a accountRepo) UpdateInterestRate(ctx context.Context, account entity.Acco
 
 	_, err := a.db.ExecContext(ctx, query, args...)
 	if err != nil {
-		return err
+		log.Println(eventName, err)
+		return errbank.TranslateDBError(err)
 	}
 	return nil
 }

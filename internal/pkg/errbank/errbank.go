@@ -1,5 +1,12 @@
 package errbank
 
+import (
+	"database/sql"
+	"log"
+
+	"github.com/lib/pq"
+)
+
 type ErrRequestISE string
 
 func NewErrRequestISE(message string) ErrRequestISE {
@@ -88,4 +95,22 @@ func NewErrServiceUnavailable(message string) ErrServiceUnavailable {
 
 func (e ErrServiceUnavailable) Error() string {
 	return string(e)
+}
+
+func TranslateDBError(err error) error {
+	if err == sql.ErrNoRows {
+		return NewErrNotFound("data not found!")
+	}
+	pgErr, ok := err.(*pq.Error)
+	if !ok {
+		log.Fatalf("Error executing query: %v", err)
+	}
+
+	switch pgErr.Code {
+	case "23505":
+		return NewErrConflict("already exist!")
+	default:
+		log.Fatalf("Error executing query: %v", err)
+	}
+	return err
 }

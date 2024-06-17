@@ -3,10 +3,12 @@ package transactionrepo
 import (
 	"context"
 	"database/sql"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/hanselacn/banking-transaction/internal/entity"
+	"github.com/hanselacn/banking-transaction/internal/pkg/errbank"
 )
 
 type TransactionRepo interface {
@@ -25,7 +27,8 @@ func NewTransactionRepo(db *sql.DB) TransactionRepo {
 // CreateTransaction implements TransactionRepo.
 func (t transactionRepo) CreateTransaction(ctx context.Context, input entity.Transaction) error {
 	var (
-		query = `
+		eventName = "repo.transaction.create"
+		query     = `
 		INSERT INTO transactions (
 		id,
 		type,
@@ -50,7 +53,8 @@ func (t transactionRepo) CreateTransaction(ctx context.Context, input entity.Tra
 
 	_, err := t.db.ExecContext(ctx, query, args...)
 	if err != nil {
-		return err
+		log.Println(eventName, err)
+		return errbank.TranslateDBError(err)
 	}
 	return nil
 }
@@ -58,7 +62,8 @@ func (t transactionRepo) CreateTransaction(ctx context.Context, input entity.Tra
 // UpdateTransaction implements TransactionRepo.
 func (t transactionRepo) UpdateTransactionStatus(ctx context.Context, trID uuid.UUID, status string, tx *sql.Tx) error {
 	var (
-		query = `
+		eventName = "repo.transaction.update_status"
+		query     = `
 		UPDATE transactions
 		SET status = $1
 		WHERE id = $2
@@ -71,12 +76,14 @@ func (t transactionRepo) UpdateTransactionStatus(ctx context.Context, trID uuid.
 	if tx != nil {
 		_, err := tx.ExecContext(ctx, query, args...)
 		if err != nil {
-			return err
+			log.Println(eventName, err)
+			return errbank.TranslateDBError(err)
 		}
 	}
 	_, err := t.db.ExecContext(ctx, query, args...)
 	if err != nil {
-		return err
+		log.Println(eventName, err)
+		return errbank.TranslateDBError(err)
 	}
 	return nil
 }

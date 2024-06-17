@@ -3,6 +3,7 @@ package usersbusiness
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"github.com/google/uuid"
 	"github.com/hanselacn/banking-transaction/internal/consts"
@@ -11,6 +12,8 @@ import (
 )
 
 type UsersBusiness interface {
+	CreateUser(ctx context.Context, input entity.CreateUserInput) (*entity.User, error)
+	UpdateRoleByUserName(ctx context.Context, input entity.User) error
 }
 
 type usersBusiness struct {
@@ -19,7 +22,7 @@ type usersBusiness struct {
 }
 
 func NewUsersBusiness(db *sql.DB) UsersBusiness {
-	return usersBusiness{
+	return &usersBusiness{
 		repo: repo.NewRepositories(db),
 		db:   db,
 	}
@@ -27,7 +30,8 @@ func NewUsersBusiness(db *sql.DB) UsersBusiness {
 
 func (b *usersBusiness) CreateUser(ctx context.Context, input entity.CreateUserInput) (*entity.User, error) {
 	var (
-		user = entity.User{
+		eventName = "business.users.create_user"
+		user      = entity.User{
 			ID:       uuid.New(),
 			Username: input.Username,
 			Fullname: input.Fullname,
@@ -40,6 +44,7 @@ func (b *usersBusiness) CreateUser(ctx context.Context, input entity.CreateUserI
 		ReadOnly:  false,
 	})
 	if err != nil {
+		log.Println(eventName, err)
 		return nil, err
 	}
 

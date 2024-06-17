@@ -3,12 +3,15 @@ package authorizationrepo
 import (
 	"context"
 	"database/sql"
+	"log"
 
+	"github.com/google/uuid"
 	"github.com/hanselacn/banking-transaction/internal/entity"
+	"github.com/hanselacn/banking-transaction/internal/pkg/errbank"
 )
 
 type AuthorizationRepositories interface {
-	FindByUserID(ctx context.Context, userID string) (*entity.Authorization, error)
+	FindByUserID(ctx context.Context, userID uuid.UUID) (*entity.Authorization, error)
 	UpdatePassword(ctx context.Context, authorization entity.Authorization) error
 	Create(ctx context.Context, authorization entity.Authorization, tx *sql.Tx) error
 }
@@ -24,11 +27,12 @@ func NewAccountRepositories(db *sql.DB) AuthorizationRepositories {
 // Create implements AuthorizationRepositories.
 func (a authorizationrepo) Create(ctx context.Context, authorization entity.Authorization, tx *sql.Tx) error {
 	var (
-		query = `
-		INSERT INTO authorization (
+		eventName = "repo.authorization.create"
+		query     = `
+		INSERT INTO authorizations (
 		id,
 		user_id,
-		pasword
+		password
 		)
 		VALUES ($1,$2,$3)
 	`
@@ -42,13 +46,16 @@ func (a authorizationrepo) Create(ctx context.Context, authorization entity.Auth
 	if tx != nil {
 		_, err := tx.ExecContext(ctx, query, args...)
 		if err != nil {
-			return err
+
+			log.Println(eventName, err)
+			return errbank.TranslateDBError(err)
 		}
 
 	} else {
 		_, err := a.db.ExecContext(ctx, query, args...)
 		if err != nil {
-			return err
+			log.Println(eventName, err)
+			return errbank.TranslateDBError(err)
 		}
 	}
 
@@ -57,8 +64,9 @@ func (a authorizationrepo) Create(ctx context.Context, authorization entity.Auth
 
 func (a authorizationrepo) UpdatePassword(ctx context.Context, authorization entity.Authorization) error {
 	var (
-		query = `
-		UPDATE authorization
+		eventName = "repo.authorization.update_password"
+		query     = `
+		UPDATE authorizations
 		SET password = $1
 		WHERE user_id = $2
 		`
@@ -70,16 +78,18 @@ func (a authorizationrepo) UpdatePassword(ctx context.Context, authorization ent
 
 	_, err := a.db.ExecContext(ctx, query, args...)
 	if err != nil {
-		return err
+		log.Println(eventName, err)
+		return errbank.TranslateDBError(err)
 	}
 	return nil
 }
 
-func (a authorizationrepo) FindByUserID(ctx context.Context, userID string) (*entity.Authorization, error) {
+func (a authorizationrepo) FindByUserID(ctx context.Context, userID uuid.UUID) (*entity.Authorization, error) {
 	var (
-		query = `
+		eventName = "repo.authorization.find_user_by_id"
+		query     = `
 		SELECT id, user_id, password
-		FROM authorization
+		FROM authorizations
 		WHERE user_id = $1
 		`
 		args = []interface{}{
@@ -88,8 +98,9 @@ func (a authorizationrepo) FindByUserID(ctx context.Context, userID string) (*en
 		auth entity.Authorization
 	)
 
-	err := a.db.QueryRowContext(ctx, query, args...).Scan(&auth)
+	err := a.db.QueryRowContext(ctx, query, args...).Scan(&auth.ID, &auth.UserID, &auth.Password)
 	if err != nil {
+		log.Println(eventName, err)
 		return nil, err
 	}
 	return &auth, nil

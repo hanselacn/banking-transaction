@@ -3,6 +3,7 @@ package accountbusiness
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"github.com/google/uuid"
 	"github.com/hanselacn/banking-transaction/internal/consts"
@@ -12,6 +13,8 @@ import (
 )
 
 type AccountBusiness interface {
+	Withdrawal(ctx context.Context, input entity.Withdrawal) error
+	Deposit(ctx context.Context, input entity.Deposit) error
 }
 
 type accountBusiness struct {
@@ -20,31 +23,38 @@ type accountBusiness struct {
 }
 
 func NewAccountBusiness(db *sql.DB) AccountBusiness {
-	return accountBusiness{
+	return &accountBusiness{
 		repo: repo.NewRepositories(db),
 		db:   db,
 	}
 }
 
 func (b *accountBusiness) Withdrawal(ctx context.Context, input entity.Withdrawal) error {
-	transactionInput := entity.Transaction{
-		ID:     uuid.New(),
-		Type:   consts.TxTypeDEBIT,
-		Amount: input.Amount,
-		Action: consts.TxActionWITHDRAWAL,
-		Status: consts.TxStatusINPROGRESS,
-	}
+	var (
+		eventName        = "business.account.withdrawal"
+		transactionInput = entity.Transaction{
+			ID:     uuid.New(),
+			Type:   consts.TxTypeDEBIT,
+			Amount: input.Amount,
+			Action: consts.TxActionWITHDRAWAL,
+			Status: consts.TxStatusINPROGRESS,
+		}
+	)
+
 	user, err := b.repo.Users.FindByUserName(ctx, input.Username)
 	if err != nil {
+		log.Println(eventName, err)
 		return err
 	}
 	err = b.repo.Transaction.CreateTransaction(ctx, transactionInput)
 	if err != nil {
+		log.Println(eventName, err)
 		return err
 	}
 
 	account, err := b.repo.Account.FindByUserID(ctx, user.ID)
 	if err != nil {
+		log.Println(eventName, err)
 		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID, consts.TxStatusFAILED, nil); err != nil {
 			return err
 		}
@@ -62,6 +72,7 @@ func (b *accountBusiness) Withdrawal(ctx context.Context, input entity.Withdrawa
 		ReadOnly:  false,
 	})
 	if err != nil {
+		log.Println(eventName, err)
 		return err
 	}
 
@@ -70,6 +81,7 @@ func (b *accountBusiness) Withdrawal(ctx context.Context, input entity.Withdrawa
 		Balance: account.Balance,
 	}, tx)
 	if err != nil {
+		log.Println(eventName, err)
 		if err := tx.Rollback(); err != nil {
 			return err
 		}
@@ -96,25 +108,32 @@ func (b *accountBusiness) Withdrawal(ctx context.Context, input entity.Withdrawa
 }
 
 func (b *accountBusiness) Deposit(ctx context.Context, input entity.Deposit) error {
-	transactionInput := entity.Transaction{
-		ID:     uuid.New(),
-		Type:   consts.TxTypeCREDIT,
-		Amount: input.Amount,
-		Action: consts.TxActionDEPOSIT,
-		Status: consts.TxStatusINPROGRESS,
-	}
+	var (
+		eventName        = "business.account.deposit"
+		transactionInput = entity.Transaction{
+			ID:     uuid.New(),
+			Type:   consts.TxTypeCREDIT,
+			Amount: input.Amount,
+			Action: consts.TxActionDEPOSIT,
+			Status: consts.TxStatusINPROGRESS,
+		}
+	)
+
 	user, err := b.repo.Users.FindByUserName(ctx, input.Username)
 	if err != nil {
+		log.Println(eventName, err)
 		return err
 	}
 
 	err = b.repo.Transaction.CreateTransaction(ctx, transactionInput)
 	if err != nil {
+		log.Println(eventName, err)
 		return err
 	}
 
 	account, err := b.repo.Account.FindByUserID(ctx, user.ID)
 	if err != nil {
+		log.Println(eventName, err)
 		if err := b.repo.Transaction.UpdateTransactionStatus(ctx, transactionInput.ID, consts.TxStatusFAILED, nil); err != nil {
 			return err
 		}
@@ -128,6 +147,7 @@ func (b *accountBusiness) Deposit(ctx context.Context, input entity.Deposit) err
 		ReadOnly:  false,
 	})
 	if err != nil {
+		log.Println(eventName, err)
 		return err
 	}
 
@@ -136,6 +156,7 @@ func (b *accountBusiness) Deposit(ctx context.Context, input entity.Deposit) err
 		Balance: account.Balance,
 	}, tx)
 	if err != nil {
+		log.Println(eventName, err)
 		if err := tx.Rollback(); err != nil {
 			return err
 		}

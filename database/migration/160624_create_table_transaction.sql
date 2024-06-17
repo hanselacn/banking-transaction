@@ -9,5 +9,5 @@ CREATE TABLE transactions (
     action transaction_action,
     status transaction_status,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

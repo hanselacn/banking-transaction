@@ -1,13 +1,20 @@
 package cfg
 
 type Config struct {
-	DB DataBase
+	DB Database
+	Server
 }
 
-type DataBase struct {
+type Database struct {
+	Driver   string
 	Name     string
-	Address  string
-	Port     string
-	UserName string
+	Host     string
+	User     string
 	Password string
+}
+
+type Server struct {
+	Address string
+	Port    string
+	TLS     string
 }
