@@ -99,6 +99,7 @@ That includes :
 - TLS enabled for secure connection
 - Payload and Input validation to prevent XSS attack
 - Placeholder ($) usage on queries to prevent SQL Injection
+- Environment variable usages for secure credential storage
 
 to run quick test use this command :
 go test ./.
