@@ -10,7 +10,7 @@ import (
 type AccountRepositories interface {
 	FindByUserID(ctx context.Context, id string) (*entity.Account, error)
 	Create(ctx context.Context, account entity.Account) error
-	UpdateBalance(ctx context.Context, account entity.Account) error
+	UpdateBalance(ctx context.Context, account entity.Account, tx *sql.Tx) error
 	UpdateInterestRate(ctx context.Context, account entity.Account) error
 }
 
@@ -51,7 +51,7 @@ func (a accountRepo) Create(ctx context.Context, account entity.Account) error {
 func (a accountRepo) FindByUserID(ctx context.Context, id string) (*entity.Account, error) {
 	var (
 		query = `
-		SELECT *
+		SELECT id, user_id, account_number, balance, interest_rate
 		FROM account
 		WHERE user_id = $1
 		`
@@ -69,7 +69,7 @@ func (a accountRepo) FindByUserID(ctx context.Context, id string) (*entity.Accou
 	return &account, nil
 }
 
-func (a accountRepo) UpdateBalance(ctx context.Context, account entity.Account) error {
+func (a accountRepo) UpdateBalance(ctx context.Context, account entity.Account, tx *sql.Tx) error {
 	var (
 		query = `
 		UPDATE account
@@ -82,9 +82,16 @@ func (a accountRepo) UpdateBalance(ctx context.Context, account entity.Account) 
 		}
 	)
 
-	_, err := a.db.ExecContext(ctx, query, args...)
-	if err != nil {
-		return err
+	if tx != nil {
+		_, err := tx.ExecContext(ctx, query, args...)
+		if err != nil {
+			return err
+		}
+	} else {
+		_, err := a.db.ExecContext(ctx, query, args...)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

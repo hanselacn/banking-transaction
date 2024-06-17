@@ -1,18 +1,20 @@
 package business
 
-import "github.com/hanselacn/banking-transaction/repo"
+import (
+	"database/sql"
 
-type Business interface {
+	authorizationbusiness "github.com/hanselacn/banking-transaction/internal/business/authorization_business"
+	usersbusiness "github.com/hanselacn/banking-transaction/internal/business/users_business"
+)
+
+type Business struct {
+	UserBusiness          usersbusiness.UsersBusiness
+	AuthorizationBusiness authorizationbusiness.AuthorizationBusiness
 }
 
-type business struct {
-	Repo repo.Repo
-}
-
-func NewBusiness(repo repo.Repo) Business {
-	return business{Repo: repo}
-}
-
-func (b business) Create() {
-
+func NewBusiness(db *sql.DB) Business {
+	return Business{
+		UserBusiness:          usersbusiness.NewUsersBusiness(db),
+		AuthorizationBusiness: authorizationbusiness.NewAuthorizationBusiness(db),
+	}
 }
