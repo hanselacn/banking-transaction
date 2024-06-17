@@ -9,7 +9,6 @@ import (
 
 	"github.com/gorilla/mux"
 	cfg "github.com/hanselacn/banking-transaction/config"
-	"github.com/hanselacn/banking-transaction/internal/consts"
 	"github.com/hanselacn/banking-transaction/internal/handler"
 	"github.com/hanselacn/banking-transaction/internal/middleware"
 	"github.com/joho/godotenv"
@@ -62,10 +61,8 @@ func main() {
 
 	h := handler.NewHandler(db)
 	m := middleware.NewMiddleware(db)
-
-	r.Handle("/banking-transaction/users/create", m.AuthenticationMiddleware((http.HandlerFunc(h.UsersHandler.CreateUserHandler)), consts.RoleSuperAdmin)).Methods("POST")
-	r.Handle("/banking-transaction/users/create/supadmin", http.HandlerFunc(h.UsersHandler.CreateUserHandler))
-
+	handler.MountUserHandler(r, h, m)
+	handler.MountAccountHandler(r, h, m)
 	// Start the server
 	fmt.Printf("Starting server on :%s \n", cfg.Server.Port)
 	switch os.Getenv("API_TLS") {

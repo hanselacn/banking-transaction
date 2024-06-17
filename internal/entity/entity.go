@@ -35,6 +35,14 @@ type Account struct {
 	InterestRate  float64   `json:"interest_rate"`
 }
 
+type AccountPresentation struct {
+	ID            uuid.UUID `json:"id"`
+	UserID        uuid.UUID `json:"user_id"`
+	AccountNumber string    `json:"account_number"`
+	Balance       string    `json:"balance"`
+	InterestRate  string    `json:"interest_rate"`
+}
+
 type ChangePasswordInput struct {
 	Username string `json:"user_name"`
 	Password string `json:"password"`

@@ -101,7 +101,7 @@ func (a authorizationrepo) FindByUserID(ctx context.Context, userID uuid.UUID) (
 	err := a.db.QueryRowContext(ctx, query, args...).Scan(&auth.ID, &auth.UserID, &auth.Password)
 	if err != nil {
 		log.Println(eventName, err)
-		return nil, err
+		return nil, errbank.TranslateDBError(err)
 	}
 	return &auth, nil
 }

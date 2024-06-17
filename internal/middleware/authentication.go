@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"database/sql"
 	"encoding/base64"
 	"log"
@@ -84,6 +85,9 @@ func (m *middleware) AuthenticationMiddleware(next http.Handler, roles ...string
 			response.JsonResponse(w, "Forbidden", nil, "Wrong Password", http.StatusForbidden)
 			return
 		}
+		r = r.WithContext(context.WithValue(ctx, CtxValueUserName, user.Username))
+		r = r.WithContext(context.WithValue(r.Context(), CtxValueRole, user.Role))
+		log.Println("User Authenticated!")
 		next.ServeHTTP(w, r)
 	})
 }

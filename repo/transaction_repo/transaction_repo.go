@@ -79,11 +79,13 @@ func (t transactionRepo) UpdateTransactionStatus(ctx context.Context, trID uuid.
 			log.Println(eventName, err)
 			return errbank.TranslateDBError(err)
 		}
+	} else {
+		_, err := t.db.ExecContext(ctx, query, args...)
+		if err != nil {
+			log.Println(eventName, err)
+			return errbank.TranslateDBError(err)
+		}
 	}
-	_, err := t.db.ExecContext(ctx, query, args...)
-	if err != nil {
-		log.Println(eventName, err)
-		return errbank.TranslateDBError(err)
-	}
+
 	return nil
 }

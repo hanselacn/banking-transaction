@@ -77,7 +77,7 @@ func (a usersRepo) FindByUserName(ctx context.Context, username string) (*entity
 	err := a.db.QueryRowContext(ctx, query, args...).Scan(&user.ID, &user.Username, &user.Fullname, &user.Role)
 	if err != nil {
 		log.Println(eventName, err)
-		return nil, err
+		return nil, errbank.TranslateDBError(err)
 	}
 
 	return &user, nil

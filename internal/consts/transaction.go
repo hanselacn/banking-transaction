@@ -1,13 +1,13 @@
 package consts
 
 const (
-	TxTypeDEBIT  = "super_admin"
-	TxTypeCREDIT = "admin"
+	TxTypeDEBIT  = "D"
+	TxTypeCREDIT = "C"
 
-	TxActionWITHDRAWAL = "customer"
-	TxActionDEPOSIT    = "customer"
-	TxActionTRANSFER   = "customer"
-	TxActionPURCHASE   = "customer"
+	TxActionWITHDRAWAL = "WITHDRAWAL"
+	TxActionDEPOSIT    = "DEPOSIT"
+	TxActionTRANSFER   = "TRANSFER"
+	TxActionPURCHASE   = "PURCHASE"
 
 	TxStatusINPROGRESS = "IN_PROGRESS"
 	TxStatusCOMPLETED  = "COMPLETED"
