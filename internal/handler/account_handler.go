@@ -159,6 +159,12 @@ func (h *AccountHandler) UpdateInterestRate(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	if payload.InterestRate < 0 || payload.InterestRate > 1 {
+		log.Println(eventName, err)
+		response.JsonResponse(w, "update interest rate error", nil, "interest_rate: interest rate must be between 0-1.", http.StatusUnprocessableEntity)
+		return
+	}
+
 	err = h.business.AccountBusiness.UpdateInterestRate(ctx, payload)
 	if err != nil {
 		var statusCode = http.StatusInternalServerError
@@ -176,10 +182,10 @@ func (h *AccountHandler) UpdateInterestRate(w http.ResponseWriter, r *http.Reque
 		case errbank.ErrTooManyRequest:
 			statusCode = http.StatusTooManyRequests
 		}
-		response.JsonResponse(w, "deposit error", nil, err, statusCode)
+		response.JsonResponse(w, "update interest rate error", nil, err, statusCode)
 		return
 	}
-	response.JsonResponse(w, "success deposit", nil, nil, http.StatusOK)
+	response.JsonResponse(w, "success update interest rate", nil, nil, http.StatusOK)
 }
 
 func (h *AccountHandler) GetAccountBalance(w http.ResponseWriter, r *http.Request) {
@@ -255,8 +261,8 @@ func (h *AccountHandler) InterestPayout(w http.ResponseWriter, r *http.Request) 
 		case errbank.ErrTooManyRequest:
 			statusCode = http.StatusTooManyRequests
 		}
-		response.JsonResponse(w, "interest compounding error error", nil, err, statusCode)
+		response.JsonResponse(w, "interest payout error error", nil, err, statusCode)
 		return
 	}
-	response.JsonResponse(w, "success interest compounding", account, nil, http.StatusOK)
+	response.JsonResponse(w, "success interest payout", account, nil, http.StatusOK)
 }

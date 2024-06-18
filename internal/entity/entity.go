@@ -70,7 +70,6 @@ type UpdateInterestRate struct {
 func (s *UpdateInterestRate) Validate() error {
 	return validation.ValidateStruct(s,
 		validation.Field(&s.Username, validation.Required, rule.UserNameRule),
-		validation.Field(&s.InterestRate, rule.InterestRateRule),
 	)
 }
 

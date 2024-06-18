@@ -16,7 +16,7 @@ var (
 	LowercaseRegex           = regexp.MustCompile("[a-z]")
 	UppercaseRegex           = regexp.MustCompile("[A-Z]")
 	LengthRegex              = regexp.MustCompile(`^.{8,20}$`)
-	InterestRate             = regexp.MustCompile(`^(?:0(?:\.\d+)?|1(?:\.0+)?)$`)
+	InterestRate             = regexp.MustCompile(`^(0(\.\d+)?|1(\.0+)?)$`)
 )
 
 var (
