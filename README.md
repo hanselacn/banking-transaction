@@ -107,4 +107,6 @@ That includes :
 
 to run quick test use this command :
 go test ./.
+
+you can custom test case on file : server_test.go
 ```

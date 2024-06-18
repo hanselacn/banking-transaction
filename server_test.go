@@ -308,7 +308,7 @@ func TestSQLInjection(t *testing.T) {
 	handler.MountAccountHandler(r, h, m)
 
 	reqBody := entity.User{
-		Username: "1=1",
+		Username: "a OR 1=1",
 		Role:     "super_admin",
 	}
 	reqBodyBytes, err := json.Marshal(reqBody)
@@ -327,6 +327,6 @@ func TestSQLInjection(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code)
 	var respBody map[string]interface{}
 	err = json.Unmarshal(rr.Body.Bytes(), &respBody)
-	assert.Equal(t, "success create user", respBody["errors"])
+	assert.Equal(t, "success update user", respBody["errors"])
 	assert.NoError(t, err)
 }
