@@ -27,6 +27,10 @@ after that directly change the role on that user in table users to 'super_admin'
 use env.example as .env to prevent error while using existing AES encrypt decryption (seeder data use the example AES KEY)
 excecute SQL on ./database/seeder
 
+Using Basic Auth the Super Admin Account :
+username : TESTING
+password : IniTestingYa@4
+
 
 After those steps, you can disable that route and begin to use the features.
 ```
